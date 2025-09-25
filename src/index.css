@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+@theme{
+  --color-gray-custom:#b8bcc3;
+  --color-blue-custom:#043a8b;
+}
