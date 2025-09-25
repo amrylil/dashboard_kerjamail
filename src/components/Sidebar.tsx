@@ -7,6 +7,7 @@ import {
   BlindsIcon,
   LogOut,
   BoxIcon,
+  Cast,
 } from "lucide-react";
 import SidebarLink from "./SidebarLink";
 
@@ -73,6 +74,13 @@ const Sidebar = ({ isOpen, toggle }: SidebarProps) => {
             to="/mailboxes"
             isOpen={isOpen}
           />
+          <SidebarLink
+            icon={Cast}
+            text="Broadcasts"
+            to="/broadcasts"
+            isOpen={isOpen}
+          />
+          <SidebarLink icon={Users} text="Users" to="/users" isOpen={isOpen} />
         </nav>
         <div className="-mx-3">
           <button className="flex w-full items-center rounded-lg px-3 py-2 text-gray-600 transition-colors duration-300 hover:bg-gray-200 hover:text-gray-700">
