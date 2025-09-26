@@ -5,7 +5,6 @@ import {
   BlindsIcon,
   LogOut,
   BoxIcon,
-  Cast,
   X,
   Archive,
 } from "lucide-react";
