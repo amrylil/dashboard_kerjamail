@@ -1,5 +1,3 @@
-// src/pages/UsersPage.tsx
-
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useUsers } from "../hooks/useUsers";
@@ -179,9 +177,6 @@ const UsersPage = () => {
       <div className="max-w-7xl mx-auto py-2">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-100 dark:bg-slate-700 rounded-xl">
-              <Users className="w-8 h-8 text-purple-600 dark:text-purple-400" />
-            </div>
             <div>
               <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                 User Management
@@ -193,7 +188,7 @@ const UsersPage = () => {
           </div>
           <button
             onClick={actions.openCreateModal}
-            className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-700 shadow-lg"
+            className="inline-flex items-center gap-2 bg-blue-800 text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-800 shadow-lg"
           >
             <Plus className="w-5 h-5" />
             Invite User
@@ -206,25 +201,25 @@ const UsersPage = () => {
             label="Total Users"
             value={stats.total}
             color="purple"
-            icon={<Users className="w-6 h-6" />}
+            icon={<Users className="w-6 h-6 text-purple-600" />}
           />
           <StatCard
             label="Administrators"
             value={stats.admins}
             color="red"
-            icon={<Shield className="w-6 h-6" />}
+            icon={<Shield className="w-6 h-6 text-red-600" />}
           />
           <StatCard
             label="Members"
             value={stats.members}
             color="blue"
-            icon={<UserIcon className="w-6 h-6" />}
+            icon={<UserIcon className="w-6 h-6 text-blue-600" />}
           />
           <StatCard
             label="Suspended"
             value={stats.suspended}
             color="green"
-            icon={<UserX className="w-6 h-6" />}
+            icon={<UserX className="w-6 h-6 text-green-600" />}
           />
         </div>
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">

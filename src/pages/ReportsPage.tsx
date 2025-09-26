@@ -1,6 +1,4 @@
-// src/pages/ReportsPage.tsx
-
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import type {
   DomainStat,
@@ -10,11 +8,9 @@ import type {
 } from "../types/reports";
 import { useReports } from "../hooks/useReports";
 
-// Komponen UI
 import GenericTable from "../components/ui/GenericTable";
 import { StatCard } from "../components/ui/StatCard";
 
-// Ikon
 import {
   BarChart2,
   HardDrive,
@@ -27,7 +23,6 @@ import {
   Download,
 } from "lucide-react";
 
-// Helper & Sub-komponen Tampilan
 const formatDate = (isoString: string) => {
   return new Date(isoString).toLocaleString("en-US", {
     dateStyle: "medium",
@@ -44,7 +39,7 @@ const StorageBar = ({ used, quota }: { used: number; quota: number }) => {
       </span>
       <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mt-1">
         <div
-          className="bg-purple-600 h-2 rounded-full"
+          className="bg-blue-600 h-2 rounded-full"
           style={{ width: `${percentage}%` }}
         />
       </div>
@@ -143,9 +138,6 @@ const ReportsPage = () => {
       <div className="max-w-7xl mx-auto py-2">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-100 dark:bg-slate-700 rounded-xl">
-              <BarChart2 className="w-8 h-8 text-purple-600 dark:text-purple-400" />
-            </div>
             <div>
               <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                 Reports & Monitoring
@@ -155,7 +147,7 @@ const ReportsPage = () => {
               </p>
             </div>
           </div>
-          <button className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-700 shadow-lg">
+          <button className="inline-flex items-center gap-2 bg-blue-800 text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-700 shadow-lg">
             <Download className="w-5 h-5" />
             Download Reports
           </button>
@@ -163,31 +155,30 @@ const ReportsPage = () => {
       </div>
 
       <div className="max-w-7xl mx-auto py-8 space-y-8">
-        {/* STATS OVERVIEW */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <StatCard
             label="Total Domains"
             value={reportStats.totalDomains}
-            color="purple"
-            icon={<BarChart2 />}
+            color="blue"
+            icon={<BarChart2 className="text-green-600" />}
           />
           <StatCard
             label="Total Storage Used"
             value={reportStats.totalStorageUsedGB}
             color="blue"
-            icon={<HardDrive />}
+            icon={<HardDrive className="text-blue-600" />}
           />
           <StatCard
             label="Total Mailboxes"
             value={reportStats.totalMailboxes}
             color="green"
-            icon={<Mailbox />}
+            icon={<Mailbox className="text-green-600" />}
           />
           <StatCard
             label="Log Events"
             value={reportStats.logEventsToday}
             color="red"
-            icon={<ShieldAlert />}
+            icon={<ShieldAlert className="text-red-600" />}
           />
         </div>
 

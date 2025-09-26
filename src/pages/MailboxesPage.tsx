@@ -54,7 +54,7 @@ const StorageBar = ({
       <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mt-1">
         <div
           className={`h-2 rounded-full ${
-            percentage > 90 ? "bg-red-500" : "bg-purple-600"
+            percentage > 90 ? "bg-red-500" : "bg-blue-600"
           }`}
           style={{ width: `${percentage}%` }}
         />
@@ -180,9 +180,6 @@ const MailboxesPage = () => {
       <div className="max-w-7xl mx-auto py-2">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-100 dark:bg-slate-700 rounded-xl">
-              <Mail className="w-8 h-8 text-purple-600" />
-            </div>
             <div>
               <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                 Mailbox Management
@@ -194,7 +191,7 @@ const MailboxesPage = () => {
           </div>
           <button
             onClick={actions.openCreateModal}
-            className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-xl font-medium"
+            className="inline-flex items-center gap-2 bg-blue-800 text-white px-6 py-3 rounded-xl font-medium"
           >
             <Plus className="w-5 h-5" />
             New Mailbox
@@ -207,25 +204,25 @@ const MailboxesPage = () => {
             label="Total Mailboxes"
             value={stats.totalMailboxes}
             color="purple"
-            icon={<Mail />}
+            icon={<Mail className="text-purple-600" />}
           />
           <StatCard
             label="Active"
             value={stats.activeCount}
             color="green"
-            icon={<CheckCircle />}
+            icon={<CheckCircle className="text-green-600" />}
           />
           <StatCard
             label="Suspended"
             value={stats.suspendedCount}
             color="red"
-            icon={<XCircle />}
+            icon={<XCircle className="text-red-600" />}
           />
           <StatCard
             label="Total Storage Used"
             value={Math.round(stats.totalStorageUsedGB)}
             color="blue"
-            icon={<HardDrive />}
+            icon={<HardDrive className="text-blue-600" />}
           />
         </div>
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6">

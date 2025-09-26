@@ -16,7 +16,7 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-white dark:bg-slate-900 overflow-hidden relative">
+    <div className="flex h-screen bg-white dark:bg-slate-900 overflow-hidden relative font-jost">
       <Sidebar
         isOpen={isSidebarOpen}
         isMobileOpen={isMobileMenuOpen}

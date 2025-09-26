@@ -25,7 +25,7 @@ const Sidebar = ({
   toggleMobile,
 }: SidebarProps) => {
   return (
-    <div className="relative z-20 flex-shrink-0 lg:mb-6 h-full">
+    <div className="relative z-20 flex-shrink-0 lg:pb-6 h-full">
       <aside
         className={` 
         h-full flex flex-col overflow-y-auto bg-slate-50 dark:bg-slate-800 

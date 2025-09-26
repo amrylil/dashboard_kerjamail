@@ -147,9 +147,6 @@ const DomainsPage = () => {
       <div className="max-w-7xl mx-auto py-2">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-100 dark:bg-slate-700 rounded-xl">
-              <Globe className="w-8 h-8 text-purple-600" />
-            </div>
             <div>
               <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                 Domains Management
@@ -161,7 +158,7 @@ const DomainsPage = () => {
           </div>
           <button
             onClick={actions.openCreateModal}
-            className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-xl font-medium"
+            className="inline-flex items-center gap-2 bg-blue-800 text-white px-6 py-3 rounded-xl font-medium"
           >
             <Plus className="w-5 h-5" />
             Add Domain
@@ -174,25 +171,25 @@ const DomainsPage = () => {
             label="Total Domains"
             value={stats.total}
             color="purple"
-            icon={<Globe />}
+            icon={<Globe className="text-purple-600" />}
           />
           <StatCard
             label="Active"
             value={stats.active}
             color="green"
-            icon={<CheckCircle />}
+            icon={<CheckCircle className="text-green-600" />}
           />
           <StatCard
             label="Pending DNS"
             value={stats.pending}
             color="blue"
-            icon={<Clock />}
+            icon={<Clock className="text-blue-600" />}
           />
           <StatCard
             label="Suspended"
             value={stats.suspended}
             color="red"
-            icon={<PauseCircle />}
+            icon={<PauseCircle className="text-red-600" />}
           />
         </div>
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6">
