@@ -11,7 +11,7 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="flex h-screen dark bg-white dark:bg-slate-900">
+    <div className="flex h-screen  bg-white dark:bg-slate-900">
       <Sidebar isOpen={isSidebarOpen} toggle={toggleSidebar} />
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header />

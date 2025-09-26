@@ -10,6 +10,7 @@ import {
   Cast,
 } from "lucide-react";
 import SidebarLink from "./SidebarLink";
+import ThemeToggle from "./ui/ThemeToggle";
 
 type SidebarProps = {
   isOpen: boolean;

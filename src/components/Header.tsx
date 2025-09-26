@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import ThemeToggle from "./ui/ThemeToggle";
 
 const SearchIcon = () => (
   <svg
@@ -127,12 +128,8 @@ const Header: React.FC = () => {
           <div className="h-8 w-px bg-gray-200 dark:bg-gray-700"></div>
 
           <div className="flex items-center space-x-1">
-            <button className="relative rounded-full p-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
-              <MailIcon />
-              <span className="absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full bg-blue-600 text-xs font-medium text-white flex items-center justify-center border-2 border-white dark:border-slate-800">
-                3
-              </span>
-            </button>
+            <ThemeToggle />
+
             <button className="relative rounded-full p-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
               <BellIcon />
               <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-orange-400 border border-white dark:border-slate-800"></span>
