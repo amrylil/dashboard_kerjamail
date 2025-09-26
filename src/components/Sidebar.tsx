@@ -24,12 +24,12 @@ const Sidebar = ({
   toggleMobile,
 }: SidebarProps) => {
   return (
-    <div className="relative z-20 flex-shrink-0 lg:mb-6">
+    <div className="relative z-20 flex-shrink-0 lg:mb-6 h-full">
       <aside
         className={` 
         h-full flex flex-col overflow-y-auto bg-slate-50 dark:bg-slate-800 
         transition-transform duration-300 ease-in-out justify-center 
-        fixed inset-y-0 left-0 z-30 w-64 p-4 
+        fixed inset-y-0 left-0 z-30 w-64 p-4 h 
         lg:relative lg:inset-auto lg:z-auto lg:translate-x-0 lg:p-0 lg:m-3 lg:rounded-lg lg:border lg:border-gray-200 dark:lg:border-gray-700
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         ${isOpen ? "lg:w-64 lg:px-5 " : "lg:w-20 lg:px-3 items-center"}
@@ -109,8 +109,8 @@ const Sidebar = ({
       <button
         onClick={toggle}
         className={`
-      absolute top-11 z-40 h-6 w-6 flex items-center justify-center rounded-full
-      text-gray-800 dark:text-gray-200 
+      absolute top-11 z-40 h-6 w-6 lg:flex items-center justify-center rounded-full
+      text-gray-800 dark:text-gray-200 hidden  
       bg-slate-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700
        transition-all duration-200
       ${isOpen ? "left-56" : "left-[75px]"}
