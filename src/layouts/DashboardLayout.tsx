@@ -11,11 +11,11 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-screen dark bg-white dark:bg-slate-900">
       <Sidebar isOpen={isSidebarOpen} toggle={toggleSidebar} />
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto p-8 bg-gray-100 mb-3 rounded-lg mr-3">
+        <main className="flex-1 overflow-y-auto p-8 bg-gray-100 rounded-lg border border-gray-200 dark:border-gray-700 mb-3  mr-3 dark:bg-slate-800">
           <Outlet />
         </main>
       </div>

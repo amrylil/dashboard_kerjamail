@@ -16,8 +16,11 @@ const SidebarLink = ({
   isOpen,
   end,
 }: SidebarLinkProps) => {
-  const activeClasses = "bg-blue-100 text-blue-custom";
-  const inactiveClasses = "text-gray-600 hover:bg-gray-100 hover:text-gray-700";
+  // Modified class strings for dark mode
+  const activeClasses =
+    "bg-blue-100 text-blue-custom dark:bg-slate-700 dark:text-sky-400";
+  const inactiveClasses =
+    "text-gray-600 dark:text-gray-50 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-700 dark:hover:text-gray-50";
 
   return (
     <NavLink

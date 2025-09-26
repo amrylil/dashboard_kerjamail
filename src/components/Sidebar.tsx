@@ -19,14 +19,15 @@ type SidebarProps = {
 const Sidebar = ({ isOpen, toggle }: SidebarProps) => {
   return (
     <aside
-      className={` flex  flex-col overflow-y-auto bg-gray-100 px-5 transition-all rounded-lg duration-300 py-3 ${
+      className={`flex flex-col overflow-y-auto bg-slate-50 dark:bg-slate-800 px-5 transition-all rounded-lg border border-gray-200 dark:border-gray-700 duration-300 py-3 ${
         isOpen ? "w-64 m-3" : "w-20 m-3 mr-6"
       }`}
     >
       <button
         onClick={toggle}
-        className={`absolute top-9 z-10 flex h-6 w-6 items-center justify-center   transform transition-all duration-200 ${
-          isOpen ? "left-56" : "left-20 bg-gray-300 shadow-md"
+        className={`absolute top-9 z-10 flex h-6 w-6 items-center justify-center rounded-full text-gray-800 dark:text-gray-200 transform transition-all duration-200 ${
+          // Modified for dark mode
+          isOpen ? "left-56" : "left-20 bg-blue-300 dark:bg-blue-600 shadow-md" // Modified for dark mode
         }`}
       >
         <ChevronLeft
@@ -41,14 +42,14 @@ const Sidebar = ({ isOpen, toggle }: SidebarProps) => {
           <img
             src="/images/kerjamail.png"
             alt=""
-            className={`${isOpen ? "h-12 w-12" : "h-10 w-10 object-cover"}`}
+            className={`${isOpen ? "h-10 w-10" : "h-10 w-10 object-cover"}`}
           />
           <div
             className={`${
               isOpen ? "flex" : "hidden"
-            } flex-col transition-all duration-200 justify-center items-center ml-2  text-slate-900`}
+            } flex-col transition-all duration-200 justify-center items-center ml-2 text-slate-900`}
           >
-            <h1 className="text-base text-xl">KERJAMAIL</h1>
+            <h1 className="text-base text-xl dark:text-slate-50">KERJAMAIL</h1>
           </div>
         </div>
       </div>
@@ -83,7 +84,8 @@ const Sidebar = ({ isOpen, toggle }: SidebarProps) => {
           <SidebarLink icon={Users} text="Users" to="/users" isOpen={isOpen} />
         </nav>
         <div className="-mx-3">
-          <button className="flex w-full items-center rounded-lg px-3 py-2 text-gray-600 transition-colors duration-300 hover:bg-gray-200 hover:text-gray-700">
+          {/* Modified button below for dark mode */}
+          <button className="flex w-full items-center rounded-lg px-3 py-2 text-gray-600 dark:text-gray-300 transition-colors duration-300 hover:bg-gray-200 dark:hover:bg-slate-700 hover:text-gray-700 dark:hover:text-gray-50">
             <LogOut className="h-5 w-5" aria-hidden="true" />
             <span
               className={`mx-2 text-sm font-medium transition-opacity duration-200 ${

@@ -79,10 +79,12 @@ const DomainsPage = () => {
       accessorKey: "name",
       cell: (row) => (
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-slate-100 rounded-lg">
-            <Globe className="w-4 h-4 text-slate-600" />
+          <div className="p-2 bg-slate-100 dark:bg-slate-700 rounded-lg">
+            <Globe className="w-4 h-4 text-slate-600 dark:text-slate-400" />
           </div>
-          <span className="font-medium text-slate-900">{row.name}</span>
+          <span className="font-medium text-slate-900 dark:text-slate-100">
+            {row.name}
+          </span>
         </div>
       ),
     },
@@ -93,8 +95,8 @@ const DomainsPage = () => {
         <span
           className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
             row.status === "Verified"
-              ? "bg-green-100 text-green-800"
-              : "bg-yellow-100 text-yellow-800"
+              ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300"
+              : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300"
           }`}
         >
           {row.status === "Verified" ? (
@@ -110,7 +112,9 @@ const DomainsPage = () => {
       header: "Date Added",
       accessorKey: "added",
       cell: (row) => (
-        <span className="text-slate-600">{formatDate(row.added)}</span>
+        <span className="text-slate-600 dark:text-slate-400">
+          {formatDate(row.added)}
+        </span>
       ),
     },
     {
@@ -120,14 +124,14 @@ const DomainsPage = () => {
         <div className="flex items-center justify-end gap-2">
           <button
             onClick={() => handleOpenEditModal(row)}
-            className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            className="p-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
             title="Edit domain"
           >
             <Edit3 className="w-4 h-4" />
           </button>
           <button
             onClick={() => handleDeleteDomain(row.id)}
-            className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            className="p-2 text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-500 hover:bg-red-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
             title="Delete domain"
           >
             <Trash2 className="w-4 h-4" />
@@ -145,20 +149,19 @@ const DomainsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header Section */}
-      <div className="bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className="min-h-screen ">
+      <div className=" dark:bg-slate-800  border-slate-200 dark:border-slate-700 ">
+        <div className="mx-auto py-2">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-xl">
-                <Globe className="w-8 h-8 text-blue-600" />
+              <div className="p-3 bg-blue-100 dark:bg-slate-700 rounded-xl">
+                <Globe className="w-8 h-8 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-slate-900">
+                <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                   Domain Management
                 </h1>
-                <p className="text-slate-600 mt-1">
+                <p className="text-slate-600 dark:text-slate-400 mt-1">
                   Manage and monitor your domains
                 </p>
               </div>
@@ -174,49 +177,48 @@ const DomainsPage = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Stats Cards */}
+      <div className="max-w-7xl mx-auto py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-all duration-200">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-200">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 rounded-xl">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+              <div className="p-3 bg-green-100 dark:bg-green-900/50 rounded-xl">
+                <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>
               <div>
-                <p className="text-slate-600 text-sm font-medium">
+                <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
                   Verified Domains
                 </p>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                   {domains.filter((d) => d.status === "Verified").length}
                 </p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-all duration-200">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-200">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-yellow-100 rounded-xl">
-                <Clock className="w-6 h-6 text-yellow-600" />
+              <div className="p-3 bg-yellow-100 dark:bg-yellow-900/50 rounded-xl">
+                <Clock className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
               </div>
               <div>
-                <p className="text-slate-600 text-sm font-medium">
+                <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
                   Pending Verification
                 </p>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                   {domains.filter((d) => d.status === "Pending").length}
                 </p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-all duration-200">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-200">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-xl">
-                <Globe className="w-6 h-6 text-blue-600" />
+              <div className="p-3 bg-blue-100 dark:bg-blue-900/50 rounded-xl">
+                <Globe className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <p className="text-slate-600 text-sm font-medium">
+                <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
                   Total Domains
                 </p>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                   {domains.length}
                 </p>
               </div>
@@ -224,8 +226,7 @@ const DomainsPage = () => {
           </div>
         </div>
 
-        {/* Table Section */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div className="p-6">
             <GenericTable<Domain>
               data={domains}
@@ -240,7 +241,6 @@ const DomainsPage = () => {
         </div>
       </div>
 
-      {/* Modal using your component */}
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
@@ -250,7 +250,7 @@ const DomainsPage = () => {
           <div>
             <label
               htmlFor="name"
-              className="block text-sm font-medium text-slate-700 mb-2"
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
             >
               Domain Name
             </label>
@@ -261,14 +261,14 @@ const DomainsPage = () => {
               defaultValue={editingDomain?.name || ""}
               placeholder="e.g., example.com"
               required
-              className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 bg-transparent border border-slate-200 dark:border-slate-600 dark:text-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
             />
           </div>
           <div className="flex justify-end gap-3 pt-4">
             <button
               type="button"
               onClick={handleCloseModal}
-              className="px-6 py-3 border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 transition-colors"
+              className="px-6 py-3 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
             >
               Cancel
             </button>
