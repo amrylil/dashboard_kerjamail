@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import ThemeToggle from "./ui/ThemeToggle";
+import ThemeToggle from "./ui/ThemeToggle"; // Pastikan path ini benar
+import { Menu, Bell, Plus } from "lucide-react";
 
+// --- Komponen Ikon ---
 const SearchIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -18,57 +20,7 @@ const SearchIcon = () => (
     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
   </svg>
 );
-const PlusIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="h-4 w-4"
-  >
-    <line x1="12" y1="5" x2="12" y2="19"></line>
-    <line x1="5" y1="12" x2="19" y2="12"></line>
-  </svg>
-);
-const MailIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="h-5 w-5"
-  >
-    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-    <polyline points="22,6 12,13 2,6"></polyline>
-  </svg>
-);
-const BellIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="h-5 w-5"
-  >
-    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-  </svg>
-);
+
 const ChevronDownIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -86,7 +38,11 @@ const ChevronDownIcon = () => (
   </svg>
 );
 
-const Header: React.FC = () => {
+type HeaderProps = {
+  toggleMobileMenu?: () => void;
+};
+
+const Header: React.FC<HeaderProps> = ({ toggleMobileMenu }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -104,40 +60,49 @@ const Header: React.FC = () => {
   }, [dropdownRef]);
 
   return (
-    <header className="bg-slate-50 dark:bg-slate-800 px-6 py-3 shadow-sm my-3 mr-3 rounded-lg border border-gray-200 dark:border-gray-700">
+    <header className="relative flex-shrink-0 bg-slate-50 dark:bg-slate-800 px-4 sm:px-6 py-3 my-3 mx-0 sm:mr-3 sm:ml-0 rounded-none sm:rounded-lg border-b sm:border border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <div className="relative">
+        {/* Sisi Kiri: Hamburger Menu (Mobile) & Search (Desktop) */}
+        <div className="flex items-center gap-4">
+          <button
+            onClick={toggleMobileMenu}
+            className="lg:hidden p-2 -ml-2 text-gray-700 dark:text-gray-300"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+
+          <div className="hidden lg:flex relative">
             <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
               <SearchIcon />
             </div>
             <input
               type="search"
-              placeholder="Search domain, mailbox, broadcast..."
+              placeholder="Search domain, mailbox..."
               className="h-10 w-80 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-slate-700 pl-11 pr-4 text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-500/40 focus:border-blue-500 transition-all"
             />
           </div>
         </div>
 
-        <div className="flex items-center space-x-4">
+        {/* Sisi Kanan: Aksi & Profil */}
+        <div className="flex items-center space-x-2 sm:space-x-4">
           <button className="flex items-center gap-2 rounded-lg bg-[#043a8b] hover:bg-[#0c2556] dark:bg-blue-600 dark:hover:bg-blue-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5">
-            <PlusIcon />
-            New Broadcast
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline">New Broadcast</span>
           </button>
 
-          <div className="h-8 w-px bg-gray-200 dark:bg-gray-700"></div>
+          <div className="h-8 w-px bg-gray-200 dark:bg-gray-700 hidden sm:block"></div>
 
           <div className="flex items-center space-x-1">
             <ThemeToggle />
-
             <button className="relative rounded-full p-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
-              <BellIcon />
+              <Bell className="h-5 w-5" />
               <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-orange-400 border border-white dark:border-slate-800"></span>
             </button>
           </div>
 
           <div className="h-8 w-px bg-gray-200 dark:bg-gray-700"></div>
 
+          {/* Dropdown Profil */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -151,7 +116,7 @@ const Header: React.FC = () => {
                 />
                 <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-green-500 border-2 border-white dark:border-slate-800"></div>
               </div>
-              <div className="text-left">
+              <div className="text-left hidden sm:block">
                 <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
                   Ulil Amry
                 </p>

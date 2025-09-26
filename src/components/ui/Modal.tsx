@@ -18,13 +18,15 @@ const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-lg rounded-lg bg-white p-6 shadow-xl"
+        className="relative w-full max-w-lg rounded-xl bg-white dark:bg-slate-800 p-6 shadow-xl border border-transparent dark:border-slate-700"
       >
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold text-gray-900">{title}</h3>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100">
+            {title}
+          </h3>
           <button
             onClick={onClose}
-            className="rounded-full p-1 text-gray-500 hover:bg-gray-100"
+            className="rounded-full p-1 text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
           >
             <X size={20} />
           </button>
