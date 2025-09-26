@@ -3,8 +3,8 @@ import DashboardLayout from "../layouts/DashboardLayout";
 import DashboardPage from "../pages/MainPage";
 import DomainsPage from "../pages/DomainPage";
 import MailboxesPage from "../pages/MailboxesPage";
-import BroadcastsPage from "../pages/BroadcastsPage";
 import UsersPage from "../pages/UsersPage";
+import ReportsPage from "../pages/ReportsPage";
 
 export const router = createBrowserRouter([
   {
@@ -24,8 +24,8 @@ export const router = createBrowserRouter([
         element: <MailboxesPage />,
       },
       {
-        path: "broadcasts",
-        element: <BroadcastsPage />,
+        path: "reports",
+        element: <ReportsPage />,
       },
       {
         path: "users",

@@ -1,210 +1,179 @@
-import React, { useState } from "react";
-import type { ColumnDef, FilterConfig } from "../components/ui/GenericTable";
+import { useMemo } from "react";
+import type { ColumnDef } from "@tanstack/react-table";
+import { useMailboxes } from "../hooks/useMailboxes";
+
 import GenericTable from "../components/ui/GenericTable";
 import Modal from "../components/ui/Modal";
+import { StatCard } from "../components/ui/StatCard";
+import ConfirmDeleteModal from "../components/ui/ConfirmDeleteModal";
+
 import {
-  Plus,
   Mail,
+  HardDrive,
   CheckCircle,
   XCircle,
   Edit3,
   Trash2,
-  AtSign,
-  Globe,
+  Plus,
+  KeyRound,
+  UserCheck,
+  UserX,
 } from "lucide-react";
+import MailboxForm from "../components/forms/MailboxForm";
+import type { Mailbox } from "../types/mailboxes";
 
-type Mailbox = {
-  id: number;
-  email: string;
-  domain: string;
-  created: string;
-  status: "Active" | "Inactive";
+const formatDate = (isoString: string) => {
+  if (isoString === "Never") return "Never";
+  const date = new Date(isoString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 };
 
-const MailboxesPage = () => {
-  const [mailboxes, setMailboxes] = useState<Mailbox[]>([
-    {
-      id: 1,
-      email: "hello@kerjamail.co",
-      domain: "kerjamail.co",
-      created: "2023-01-15",
-      status: "Active",
-    },
-    {
-      id: 2,
-      email: "info@example.com",
-      domain: "example.com",
-      created: "2023-03-22",
-      status: "Active",
-    },
-    {
-      id: 3,
-      email: "support@example.com",
-      domain: "example.com",
-      created: "2023-04-01",
-      status: "Inactive",
-    },
-    {
-      id: 4,
-      email: "contact@new-project.io",
-      domain: "new-project.io",
-      created: "2023-09-10",
-      status: "Active",
-    },
-  ]);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingMailbox, setEditingMailbox] = useState<Mailbox | null>(null);
-
-  const handleOpenCreateModal = () => {
-    setEditingMailbox(null);
-    setIsModalOpen(true);
-  };
-
-  const handleOpenEditModal = (mailbox: Mailbox) => {
-    setEditingMailbox(mailbox);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingMailbox(null);
-  };
-
-  const handleDeleteMailbox = (id: number) => {
-    if (window.confirm("Are you sure you want to delete this mailbox?")) {
-      setMailboxes(mailboxes.filter((m) => m.id !== id));
-    }
-  };
-
-  const handleSaveMailbox = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const mailboxEmail = formData.get("email") as string;
-    const mailboxStatus = formData.get("status") as "Active" | "Inactive";
-
-    if (editingMailbox) {
-      setMailboxes(
-        mailboxes.map((m) =>
-          m.id === editingMailbox.id
-            ? {
-                ...m,
-                email: mailboxEmail,
-                status: mailboxStatus,
-                domain: mailboxEmail.split("@")[1] || "N/A",
-              }
-            : m
-        )
-      );
-    } else {
-      const newMailbox: Mailbox = {
-        id: Date.now(),
-        email: mailboxEmail,
-        domain: mailboxEmail.split("@")[1] || "N/A",
-        status: mailboxStatus,
-        created: new Date().toISOString().split("T")[0],
-      };
-      setMailboxes([...mailboxes, newMailbox]);
-    }
-    handleCloseModal();
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  const columns: ColumnDef<Mailbox>[] = [
-    {
-      header: "Email Address",
-      accessorKey: "email",
-      cell: (row) => (
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-100 dark:bg-slate-700 rounded-lg">
-            <Mail className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-          </div>
-          <span className="font-medium text-slate-900 dark:text-slate-100">
-            {row.email}
-          </span>
-        </div>
-      ),
-    },
-    {
-      header: "Domain",
-      accessorKey: "domain",
-      cell: (row) => (
-        <div className="flex items-center gap-2">
-          <Globe className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-          <span className="text-slate-600 dark:text-slate-400">
-            {row.domain}
-          </span>
-        </div>
-      ),
-    },
-    {
-      header: "Status",
-      accessorKey: "status",
-      cell: (row) => (
-        <span
-          className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
-            row.status === "Active"
-              ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300"
-              : "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-500"
+const StorageBar = ({
+  used,
+  quota,
+}: {
+  used: number;
+  quota: number | "unlimited";
+}) => {
+  if (quota === "unlimited") {
+    return <span className="font-medium">{used.toFixed(1)} GB / ∞</span>;
+  }
+  const percentage = (used / quota) * 100;
+  return (
+    <div>
+      <div className="flex justify-between text-sm">
+        <span className="font-medium text-slate-800 dark:text-slate-200">
+          {used.toFixed(1)} GB / {quota} GB
+        </span>
+        <span className="text-slate-500">{Math.round(percentage)}%</span>
+      </div>
+      <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mt-1">
+        <div
+          className={`h-2 rounded-full ${
+            percentage > 90 ? "bg-red-500" : "bg-purple-600"
           }`}
-        >
-          {row.status === "Active" ? (
-            <CheckCircle className="w-4 h-4" />
-          ) : (
-            <XCircle className="w-4 h-4" />
-          )}
-          {row.status}
-        </span>
-      ),
-    },
-    {
-      header: "Date Created",
-      accessorKey: "created",
-      cell: (row) => (
-        <span className="text-slate-600 dark:text-slate-400">
-          {formatDate(row.created)}
-        </span>
-      ),
-    },
-    {
-      header: "Actions",
-      accessorKey: "id",
-      cell: (row) => (
-        <div className="flex items-center justify-end gap-2">
-          <button
-            onClick={() => handleOpenEditModal(row)}
-            className="p-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
-            title="Edit mailbox"
-          >
-            <Edit3 className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => handleDeleteMailbox(row.id)}
-            className="p-2 text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-500 hover:bg-red-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
-            title="Delete mailbox"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
-      ),
-    },
-  ];
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+    </div>
+  );
+};
 
-  const uniqueDomains = [...new Set(mailboxes.map((m) => m.domain))];
-  const filterConfig: FilterConfig<Mailbox> = {
-    status: [
-      { label: "Active", value: "Active" },
-      { label: "Inactive", value: "Inactive" },
+const StatusDisplay = ({ status }: { status: Mailbox["status"] }) =>
+  status === "Active" ? (
+    <span className="inline-flex items-center gap-2 text-green-700 dark:text-green-400">
+      <CheckCircle className="w-4 h-4" /> Active
+    </span>
+  ) : (
+    <span className="inline-flex items-center gap-2 text-red-700 dark:text-red-500">
+      <XCircle className="w-4 h-4" /> Suspended
+    </span>
+  );
+
+const MailboxesPage = () => {
+  const {
+    mailboxes,
+    isFormModalOpen,
+    editingMailbox,
+    mailboxToDelete,
+    stats,
+    filterConfig,
+    availableDomains,
+    actions,
+  } = useMailboxes();
+
+  const columns = useMemo<ColumnDef<Mailbox>[]>(
+    () => [
+      {
+        header: "Email Address",
+        accessorKey: "email",
+        enableSorting: true,
+        cell: ({ row }) => (
+          <div>
+            <div className="font-medium text-slate-900 dark:text-slate-100">
+              {row.original.email}
+            </div>
+            <div className="text-sm text-slate-500 dark:text-slate-400">
+              Owner: {row.original.owner || "N/A"}
+            </div>
+          </div>
+        ),
+      },
+      {
+        header: "Storage Used",
+        accessorKey: "storageUsedGB",
+        enableSorting: true,
+        cell: ({ row }) => (
+          <StorageBar
+            used={row.original.storageUsedGB}
+            quota={row.original.quotaGB}
+          />
+        ),
+      },
+      {
+        header: "Status",
+        accessorKey: "status",
+        enableSorting: true,
+        enableColumnFilter: true,
+        filterFn: "arrIncludesSome",
+        cell: ({ row }) => <StatusDisplay status={row.original.status} />,
+      },
+      {
+        header: "Last Login",
+        accessorKey: "lastLogin",
+        enableSorting: true,
+        cell: ({ row }) => formatDate(row.original.lastLogin),
+      },
+      {
+        header: "Actions",
+        id: "actions",
+        cell: ({ row }) => (
+          <div className="flex items-center justify-end gap-1">
+            <button
+              className="p-2 text-slate-600 hover:text-green-600"
+              title="Reset Password"
+            >
+              <KeyRound className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => actions.toggleMailboxStatus(row.original.id)}
+              className="p-2 text-slate-600 hover:text-yellow-600"
+              title={
+                row.original.status === "Active"
+                  ? "Suspend Mailbox"
+                  : "Unsuspend"
+              }
+            >
+              {row.original.status === "Active" ? (
+                <UserX className="w-4 h-4" />
+              ) : (
+                <UserCheck className="w-4 h-4" />
+              )}
+            </button>
+            <button
+              onClick={() => actions.openEditModal(row.original)}
+              className="p-2 text-slate-600 hover:text-blue-600"
+              title="Edit Mailbox"
+            >
+              <Edit3 className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => actions.openDeleteModal(row.original)}
+              className="p-2 text-slate-600 hover:text-red-600"
+              title="Delete Mailbox"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        ),
+      },
     ],
-    domain: uniqueDomains.map((d) => ({ label: d, value: d })),
-  };
+    [actions]
+  );
 
   return (
     <div className="min-h-screen">
@@ -212,166 +181,84 @@ const MailboxesPage = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-purple-100 dark:bg-slate-700 rounded-xl">
-              <Mail className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+              <Mail className="w-8 h-8 text-purple-600" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                 Mailbox Management
               </h1>
               <p className="text-slate-600 dark:text-slate-400 mt-1">
-                Manage email addresses and mailboxes
+                Manage email accounts and their resources
               </p>
             </div>
           </div>
           <button
-            onClick={handleOpenCreateModal}
-            className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            onClick={actions.openCreateModal}
+            className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-xl font-medium"
           >
             <Plus className="w-5 h-5" />
-            Create Mailbox
+            New Mailbox
           </button>
         </div>
       </div>
-
-      <div className="max-w-7xl mx-auto  py-8">
+      <div className="max-w-7xl mx-auto py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-200">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 dark:bg-green-900/50 rounded-xl">
-                <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
-                  Active Mailboxes
-                </p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                  {mailboxes.filter((m) => m.status === "Active").length}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-200">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-red-100 dark:bg-red-900/50 rounded-xl">
-                <XCircle className="w-6 h-6 text-red-600 dark:text-red-500" />
-              </div>
-              <div>
-                <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
-                  Inactive Mailboxes
-                </p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                  {mailboxes.filter((m) => m.status === "Inactive").length}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-200">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 dark:bg-blue-900/50 rounded-xl">
-                <Globe className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div>
-                <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
-                  Unique Domains
-                </p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                  {new Set(mailboxes.map((m) => m.domain)).size}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-200">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-100 dark:bg-purple-900/50 rounded-xl">
-                <Mail className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-              </div>
-              <div>
-                <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
-                  Total Mailboxes
-                </p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                  {mailboxes.length}
-                </p>
-              </div>
-            </div>
-          </div>
+          <StatCard
+            label="Total Mailboxes"
+            value={stats.totalMailboxes}
+            color="purple"
+            icon={<Mail />}
+          />
+          <StatCard
+            label="Active"
+            value={stats.activeCount}
+            color="green"
+            icon={<CheckCircle />}
+          />
+          <StatCard
+            label="Suspended"
+            value={stats.suspendedCount}
+            color="red"
+            icon={<XCircle />}
+          />
+          <StatCard
+            label="Total Storage Used"
+            value={Math.round(stats.totalStorageUsedGB)}
+            color="blue"
+            icon={<HardDrive />}
+          />
         </div>
-
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-          <div className="p-6">
-            <GenericTable<Mailbox>
-              data={mailboxes}
-              columns={columns}
-              enableSearch={true}
-              searchPlaceholder="Search by email or domain..."
-              enableFilter={true}
-              filterConfig={filterConfig}
-              showResultCount={true}
-            />
-          </div>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6">
+          <GenericTable
+            data={mailboxes}
+            columns={columns}
+            enableSearch
+            searchPlaceholder="Search by email..."
+            enableFilter
+            filterConfig={filterConfig}
+            showResultCount
+            enablePagination
+          />
         </div>
       </div>
-
       <Modal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        isOpen={isFormModalOpen}
+        onClose={actions.closeFormModal}
         title={editingMailbox ? "Edit Mailbox" : "Create New Mailbox"}
       >
-        <form onSubmit={handleSaveMailbox} className="space-y-6">
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-            >
-              Email Address
-            </label>
-            <div className="relative">
-              <AtSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-slate-500 w-5 h-5" />
-              <input
-                type="email"
-                name="email"
-                id="email"
-                defaultValue={editingMailbox?.email || ""}
-                placeholder="e.g., hello@example.com"
-                required
-                className="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-              />
-            </div>
-          </div>
-          <div>
-            <label
-              htmlFor="status"
-              className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-            >
-              Status
-            </label>
-            <select
-              id="status"
-              name="status"
-              defaultValue={editingMailbox?.status || "Active"}
-              className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors appearance-none"
-            >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
-          </div>
-          <div className="flex justify-end gap-3 pt-4">
-            <button
-              type="button"
-              onClick={handleCloseModal}
-              className="px-6 py-3 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-3 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors shadow-sm hover:shadow-md"
-            >
-              Save Mailbox
-            </button>
-          </div>
-        </form>
+        <MailboxForm
+          onSubmit={actions.saveMailbox}
+          onCancel={actions.closeFormModal}
+          initialData={editingMailbox}
+          availableDomains={availableDomains}
+        />
       </Modal>
+      <ConfirmDeleteModal
+        isOpen={!!mailboxToDelete}
+        onCancel={actions.closeDeleteModal}
+        onConfirm={actions.confirmDelete}
+        itemName={mailboxToDelete?.email || ""}
+      />
     </div>
   );
 };

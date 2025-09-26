@@ -1,285 +1,234 @@
-import React, { useState } from "react";
-import type { ColumnDef, FilterConfig } from "../components/ui/GenericTable";
-import GenericTable from "../components/ui/GenericTable";
-import Modal from "../components/ui/Modal";
-import { Plus, Globe, CheckCircle, Clock, Edit3, Trash2 } from "lucide-react";
+import { useMemo } from "react";
+import type { ColumnDef } from "@tanstack/react-table";
 
-type Domain = {
-  id: number;
-  name: string;
-  status: "Verified" | "Pending";
-  added: string;
+import GenericTable from "../components/ui/GenericTable";
+import { StatCard } from "../components/ui/StatCard";
+import ConfirmDeleteModal from "../components/ui/ConfirmDeleteModal";
+import DnsInstructionsModal from "../components/ui/DnsInstructionsModal";
+
+import {
+  Globe,
+  CheckCircle,
+  Clock,
+  PauseCircle,
+  Plus,
+  Trash2,
+  Settings,
+  CloudCheck,
+  ToggleRight,
+  ToggleLeft,
+} from "lucide-react";
+import type { Domain } from "../types/domain";
+import DomainForm from "../components/forms/DomainForm";
+import Modal from "../components/ui/Modal";
+import { useDomains } from "../hooks/useDomain";
+
+const formatDate = (isoString: string) =>
+  new Date(isoString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+
+const StatusDisplay = ({ status }: { status: Domain["status"] }) => {
+  const styles = {
+    Active: { icon: CheckCircle, color: "text-green-800 bg-green-100" },
+    "Pending DNS": { icon: Clock, color: "text-yellow-800 bg-yellow-100" },
+    Suspended: { icon: PauseCircle, color: "text-red-800 bg-red-100" },
+  };
+  const { icon: Icon, color } = styles[status];
+  return (
+    <span
+      className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${color}`}
+    >
+      <Icon className="w-4 h-4" />
+      {status}
+    </span>
+  );
 };
 
 const DomainsPage = () => {
-  const [domains, setDomains] = useState<Domain[]>([
-    { id: 1, name: "kerjamail.co", status: "Verified", added: "2023-01-15" },
-    { id: 2, name: "example.com", status: "Verified", added: "2023-03-22" },
-    { id: 3, name: "new-project.io", status: "Pending", added: "2023-09-10" },
-  ]);
+  const {
+    domains,
+    isFormModalOpen,
+    domainToDelete,
+    domainForDns,
+    stats,
+    filterConfig,
+    actions,
+  } = useDomains();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingDomain, setEditingDomain] = useState<Domain | null>(null);
-
-  const handleOpenCreateModal = () => {
-    setEditingDomain(null);
-    setIsModalOpen(true);
-  };
-
-  const handleOpenEditModal = (domain: Domain) => {
-    setEditingDomain(domain);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingDomain(null);
-  };
-
-  const handleDeleteDomain = (id: number) => {
-    if (window.confirm("Are you sure you want to delete this domain?")) {
-      setDomains(domains.filter((d) => d.id !== id));
-    }
-  };
-
-  const handleSaveDomain = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const domainName = formData.get("name") as string;
-
-    if (editingDomain) {
-      setDomains(
-        domains.map((d) =>
-          d.id === editingDomain.id ? { ...d, name: domainName } : d
-        )
-      );
-    } else {
-      const newDomain: Domain = {
-        id: Date.now(),
-        name: domainName,
-        status: "Pending",
-        added: new Date().toISOString().split("T")[0],
-      };
-      setDomains([...domains, newDomain]);
-    }
-    handleCloseModal();
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  const columns: ColumnDef<Domain>[] = [
-    {
-      header: "Domain Name",
-      accessorKey: "name",
-      cell: (row) => (
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-slate-100 dark:bg-slate-700 rounded-lg">
-            <Globe className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+  const columns = useMemo<ColumnDef<Domain>[]>(
+    () => [
+      {
+        header: "Domain",
+        accessorKey: "domainName",
+        enableSorting: true,
+        cell: ({ row }) => (
+          <div>
+            <div className="font-bold text-slate-900 dark:text-slate-100">
+              {row.original.domainName}
+            </div>
+            <div className="text-xs text-slate-500">
+              Expires on {formatDate(row.original.expiryDate)}
+            </div>
           </div>
-          <span className="font-medium text-slate-900 dark:text-slate-100">
-            {row.name}
-          </span>
-        </div>
-      ),
-    },
-    {
-      header: "Status",
-      accessorKey: "status",
-      cell: (row) => (
-        <span
-          className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
-            row.status === "Verified"
-              ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300"
-              : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300"
-          }`}
-        >
-          {row.status === "Verified" ? (
-            <CheckCircle className="w-4 h-4" />
-          ) : (
-            <Clock className="w-4 h-4" />
-          )}
-          {row.status}
-        </span>
-      ),
-    },
-    {
-      header: "Date Added",
-      accessorKey: "added",
-      cell: (row) => (
-        <span className="text-slate-600 dark:text-slate-400">
-          {formatDate(row.added)}
-        </span>
-      ),
-    },
-    {
-      header: "Actions",
-      accessorKey: "id",
-      cell: (row) => (
-        <div className="flex items-center justify-end gap-2">
-          <button
-            onClick={() => handleOpenEditModal(row)}
-            className="p-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
-            title="Edit domain"
-          >
-            <Edit3 className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => handleDeleteDomain(row.id)}
-            className="p-2 text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-500 hover:bg-red-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
-            title="Delete domain"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
-      ),
-    },
-  ];
-
-  const filterConfig: FilterConfig<Domain> = {
-    status: [
-      { label: "Verified", value: "Verified" },
-      { label: "Pending", value: "Pending" },
+        ),
+      },
+      {
+        header: "Status",
+        accessorKey: "status",
+        enableSorting: true,
+        enableColumnFilter: true,
+        filterFn: "arrIncludesSome",
+        cell: ({ row }) => <StatusDisplay status={row.original.status} />,
+      },
+      {
+        header: "Active Mailboxes",
+        accessorKey: "activeMailboxes",
+        enableSorting: true,
+      },
+      {
+        header: "Created At",
+        accessorKey: "createdAt",
+        enableSorting: true,
+        cell: ({ row }) => formatDate(row.original.createdAt),
+      },
+      {
+        header: "Actions",
+        id: "actions",
+        cell: ({ row }) => (
+          <div className="flex items-center justify-end gap-1">
+            {row.original.status === "Pending DNS" && (
+              <button
+                onClick={() => actions.verifyDomain(row.original.id)}
+                className="p-2 text-slate-600 hover:text-green-600"
+                title="Verify DNS"
+              >
+                <CloudCheck className="w-4 h-4" />
+              </button>
+            )}
+            <button
+              onClick={() => actions.openDnsModal(row.original)}
+              className="p-2 text-slate-600 hover:text-blue-600"
+              title="Manage DNS"
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => actions.toggleDomainStatus(row.original.id)}
+              className="p-2 text-slate-600 hover:text-yellow-600"
+              title={
+                row.original.status === "Suspended" ? "Activate" : "Suspend"
+              }
+            >
+              {row.original.status === "Suspended" ? (
+                <ToggleRight className="w-4 h-4" />
+              ) : (
+                <ToggleLeft className="w-4 h-4" />
+              )}
+            </button>
+            <button
+              onClick={() => actions.openDeleteModal(row.original)}
+              className="p-2 text-slate-600 hover:text-red-600"
+              title="Delete Domain"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        ),
+      },
     ],
-  };
+    [actions]
+  );
 
   return (
-    <div className="min-h-screen ">
-      <div className=" dark:bg-slate-800  border-slate-200 dark:border-slate-700 ">
-        <div className="mx-auto py-2">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 dark:bg-slate-700 rounded-xl">
-                <Globe className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
-                  Domain Management
-                </h1>
-                <p className="text-slate-600 dark:text-slate-400 mt-1">
-                  Manage and monitor your domains
-                </p>
-              </div>
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto py-2">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-purple-100 dark:bg-slate-700 rounded-xl">
+              <Globe className="w-8 h-8 text-purple-600" />
             </div>
-            <button
-              onClick={handleOpenCreateModal}
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-            >
-              <Plus className="w-5 h-5" />
-              Add Domain
-            </button>
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                Domains Management
+              </h1>
+              <p className="text-slate-600 dark:text-slate-400 mt-1">
+                Add and verify domains for your organization
+              </p>
+            </div>
           </div>
+          <button
+            onClick={actions.openCreateModal}
+            className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-xl font-medium"
+          >
+            <Plus className="w-5 h-5" />
+            Add Domain
+          </button>
         </div>
       </div>
-
       <div className="max-w-7xl mx-auto py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-200">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 dark:bg-green-900/50 rounded-xl">
-                <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
-                  Verified Domains
-                </p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                  {domains.filter((d) => d.status === "Verified").length}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-200">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-yellow-100 dark:bg-yellow-900/50 rounded-xl">
-                <Clock className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
-              </div>
-              <div>
-                <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
-                  Pending Verification
-                </p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                  {domains.filter((d) => d.status === "Pending").length}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-200">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 dark:bg-blue-900/50 rounded-xl">
-                <Globe className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div>
-                <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
-                  Total Domains
-                </p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                  {domains.length}
-                </p>
-              </div>
-            </div>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <StatCard
+            label="Total Domains"
+            value={stats.total}
+            color="purple"
+            icon={<Globe />}
+          />
+          <StatCard
+            label="Active"
+            value={stats.active}
+            color="green"
+            icon={<CheckCircle />}
+          />
+          <StatCard
+            label="Pending DNS"
+            value={stats.pending}
+            color="blue"
+            icon={<Clock />}
+          />
+          <StatCard
+            label="Suspended"
+            value={stats.suspended}
+            color="red"
+            icon={<PauseCircle />}
+          />
         </div>
-
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-          <div className="p-6">
-            <GenericTable<Domain>
-              data={domains}
-              columns={columns}
-              enableSearch={true}
-              searchPlaceholder="Search domains..."
-              enableFilter={true}
-              filterConfig={filterConfig}
-              showResultCount={true}
-            />
-          </div>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6">
+          <GenericTable
+            data={domains}
+            columns={columns}
+            enableSearch
+            searchPlaceholder="Search domains..."
+            enableFilter
+            filterConfig={filterConfig}
+            showResultCount
+            enablePagination
+          />
         </div>
       </div>
 
+      <DnsInstructionsModal
+        isOpen={!!domainForDns}
+        onClose={actions.closeDnsModal}
+        domain={domainForDns}
+      />
+      <ConfirmDeleteModal
+        isOpen={!!domainToDelete}
+        onCancel={actions.closeDeleteModal}
+        onConfirm={actions.confirmDelete}
+        itemName={domainToDelete?.domainName || ""}
+      />
       <Modal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        title={editingDomain ? "Edit Domain" : "Add New Domain"}
+        isOpen={isFormModalOpen}
+        onClose={actions.closeFormModal}
+        title="Add New Domain"
       >
-        <form onSubmit={handleSaveDomain} className="space-y-6">
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-            >
-              Domain Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              defaultValue={editingDomain?.name || ""}
-              placeholder="e.g., example.com"
-              required
-              className="w-full px-4 py-3 bg-transparent border border-slate-200 dark:border-slate-600 dark:text-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-            />
-          </div>
-          <div className="flex justify-end gap-3 pt-4">
-            <button
-              type="button"
-              onClick={handleCloseModal}
-              className="px-6 py-3 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-sm hover:shadow-md"
-            >
-              Save Domain
-            </button>
-          </div>
-        </form>
+        <DomainForm
+          onSubmit={actions.saveDomain}
+          onCancel={actions.closeFormModal}
+        />
       </Modal>
     </div>
   );

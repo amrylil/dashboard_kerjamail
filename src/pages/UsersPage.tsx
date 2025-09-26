@@ -1,227 +1,262 @@
-import React, { useState } from "react";
-import Modal from "../components/ui/Modal";
-import type { ColumnDef, FilterConfig } from "../components/ui/GenericTable";
-import GenericTable from "../components/ui/GenericTable";
+// src/pages/UsersPage.tsx
 
-type User = {
-  id: number;
-  name: string;
-  email: string;
-  role: "Admin" | "Editor" | "Viewer";
-  joined: string;
+import { useMemo } from "react";
+import type { ColumnDef } from "@tanstack/react-table";
+import { useUsers } from "../hooks/useUsers";
+
+import GenericTable from "../components/ui/GenericTable";
+import Modal from "../components/ui/Modal";
+import { StatCard } from "../components/ui/StatCard";
+import ConfirmDeleteModal from "../components/ui/ConfirmDeleteModal";
+
+import {
+  Users,
+  Shield,
+  Crown,
+  User as UserIcon,
+  UserX,
+  UserCheck,
+  Edit3,
+  Trash2,
+  Plus,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
+import type { User } from "../types/users";
+import UserForm from "../components/forms/UserForm";
+
+const formatDate = (dateString: string) =>
+  new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+const getInitials = (name: string) =>
+  name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+
+const RoleDisplay = ({ role }: { role: User["role"] }) => {
+  const styles = {
+    Owner: {
+      icon: Crown,
+      color:
+        "text-amber-800 bg-amber-100 dark:text-amber-300 dark:bg-amber-900/50",
+    },
+    Admin: {
+      icon: Shield,
+      color: "text-red-800 bg-red-100 dark:text-red-300 dark:bg-red-900/50",
+    },
+    Member: {
+      icon: UserIcon,
+      color:
+        "text-slate-800 bg-slate-100 dark:text-slate-300 dark:bg-slate-700",
+    },
+  };
+  const { icon: Icon, color } = styles[role];
+  return (
+    <span
+      className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${color}`}
+    >
+      <Icon className="w-4 h-4" />
+      {role}
+    </span>
+  );
+};
+
+const StatusDisplay = ({ status }: { status: User["status"] }) => {
+  return status === "Active" ? (
+    <span className="inline-flex items-center gap-2 text-green-700 dark:text-green-400">
+      <CheckCircle className="w-4 h-4" /> Active
+    </span>
+  ) : (
+    <span className="inline-flex items-center gap-2 text-red-700 dark:text-red-500">
+      <XCircle className="w-4 h-4" /> Suspended
+    </span>
+  );
 };
 
 const UsersPage = () => {
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john.doe@kerjamail.co",
-      role: "Admin",
-      joined: "2023-01-10",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane.smith@kerjamail.co",
-      role: "Editor",
-      joined: "2023-02-20",
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      email: "mike.j@kerjamail.co",
-      role: "Viewer",
-      joined: "2023-05-15",
-    },
-  ]);
+  const {
+    users,
+    isFormModalOpen,
+    editingUser,
+    userToDelete,
+    stats,
+    filterConfig,
+    actions,
+  } = useUsers();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-
-  const handleOpenCreateModal = () => {
-    setEditingUser(null);
-    setIsModalOpen(true);
-  };
-
-  const handleOpenEditModal = (user: User) => {
-    setEditingUser(user);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingUser(null);
-  };
-
-  const handleSaveUser = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const user_name = formData.get("name") as string;
-    const user_email = formData.get("email") as string;
-    const user_role = formData.get("role") as "Admin" | "Editor" | "Viewer";
-
-    if (editingUser) {
-      // Logic untuk update user
-      console.log("Updating user:", {
-        ...editingUser,
-        name: user_name,
-        email: user_email,
-        role: user_role,
-      });
-      setUsers(
-        users.map((u) =>
-          u.id === editingUser.id
-            ? {
-                ...editingUser,
-                name: user_name,
-                email: user_email,
-                role: user_role,
+  const columns = useMemo<ColumnDef<User>[]>(
+    () => [
+      {
+        header: "Name",
+        accessorKey: "name",
+        enableSorting: true,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-slate-700 flex items-center justify-center font-bold text-purple-600 dark:text-purple-400">
+              {getInitials(row.original.name)}
+            </div>
+            <div>
+              <div className="font-medium text-slate-900 dark:text-slate-100">
+                {row.original.name}
+              </div>
+              <div className="text-sm text-slate-500 dark:text-slate-400">
+                {row.original.email}
+              </div>
+            </div>
+          </div>
+        ),
+      },
+      {
+        header: "Role",
+        accessorKey: "role",
+        enableSorting: true,
+        enableColumnFilter: true,
+        filterFn: "arrIncludesSome",
+        cell: ({ row }) => <RoleDisplay role={row.original.role} />,
+      },
+      {
+        header: "Status",
+        accessorKey: "status",
+        enableSorting: true,
+        enableColumnFilter: true,
+        filterFn: "arrIncludesSome",
+        cell: ({ row }) => <StatusDisplay status={row.original.status} />,
+      },
+      {
+        header: "Date Joined",
+        accessorKey: "joined",
+        enableSorting: true,
+        cell: ({ row }) => formatDate(row.original.joined),
+      },
+      {
+        header: "Actions",
+        id: "actions",
+        cell: ({ row }) => (
+          <div className="flex items-center justify-end gap-2">
+            <button
+              onClick={() => actions.toggleUserStatus(row.original.id)}
+              className="p-2 text-slate-600 hover:text-yellow-600"
+              title={
+                row.original.status === "Active"
+                  ? "Suspend User"
+                  : "Unsuspend User"
               }
-            : u
-        )
-      );
-    } else {
-      // Logic untuk create user baru
-      const newUser = {
-        id: Date.now(),
-        name: user_name,
-        email: user_email,
-        role: user_role,
-        joined: new Date().toISOString().split("T")[0],
-      };
-      console.log("Creating new user:", newUser);
-      setUsers([...users, newUser]);
-    }
-    handleCloseModal();
-  };
-
-  const columns: ColumnDef<User>[] = [
-    { header: "Name", accessorKey: "name" },
-    { header: "Email", accessorKey: "email" },
-    { header: "Role", accessorKey: "role" },
-    { header: "Date Joined", accessorKey: "joined" },
-    {
-      header: "Actions",
-      accessorKey: "id",
-      cell: (row) => (
-        <div className="text-right">
-          <button
-            onClick={() => handleOpenEditModal(row)}
-            className="text-indigo-600 hover:text-indigo-900 mr-4 font-medium"
-          >
-            Edit
-          </button>
-          <button className="text-red-600 hover:text-red-900 font-medium">
-            Remove
-          </button>
-        </div>
-      ),
-    },
-  ];
-
-  const filterConfig: FilterConfig<User> = {
-    role: [
-      { label: "Admin", value: "Admin" },
-      { label: "Editor", value: "Editor" },
-      { label: "Viewer", value: "Viewer" },
+            >
+              {row.original.status === "Active" ? (
+                <UserX className="w-4 h-4" />
+              ) : (
+                <UserCheck className="w-4 h-4" />
+              )}
+            </button>
+            <button
+              onClick={() => actions.openEditModal(row.original)}
+              className="p-2 text-slate-600 hover:text-blue-600"
+              title="Edit User"
+            >
+              <Edit3 className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => actions.openDeleteModal(row.original)}
+              className="p-2 text-slate-600 hover:text-red-600"
+              title="Remove User"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        ),
+      },
     ],
-  };
+    [actions]
+  );
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Users & Teams</h1>
-        <button
-          onClick={handleOpenCreateModal}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
-        >
-          Invite User
-        </button>
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto py-2">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-purple-100 dark:bg-slate-700 rounded-xl">
+              <Users className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                User Management
+              </h1>
+              <p className="text-slate-600 dark:text-slate-400 mt-1">
+                Invite and manage team members and their roles
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={actions.openCreateModal}
+            className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-700 shadow-lg"
+          >
+            <Plus className="w-5 h-5" />
+            Invite User
+          </button>
+        </div>
       </div>
-      <GenericTable<User>
-        data={users}
-        columns={columns}
-        enableSearch
-        searchPlaceholder="Search by name or email..."
-        enableFilter
-        filterConfig={filterConfig}
-        showResultCount
-      />
-
+      <div className="max-w-7xl mx-auto py-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <StatCard
+            label="Total Users"
+            value={stats.total}
+            color="purple"
+            icon={<Users className="w-6 h-6" />}
+          />
+          <StatCard
+            label="Administrators"
+            value={stats.admins}
+            color="red"
+            icon={<Shield className="w-6 h-6" />}
+          />
+          <StatCard
+            label="Members"
+            value={stats.members}
+            color="blue"
+            icon={<UserIcon className="w-6 h-6" />}
+          />
+          <StatCard
+            label="Suspended"
+            value={stats.suspended}
+            color="green"
+            icon={<UserX className="w-6 h-6" />}
+          />
+        </div>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+          <GenericTable
+            data={users}
+            columns={columns}
+            enableSearch
+            searchPlaceholder="Search by name or email..."
+            enableFilter
+            filterConfig={filterConfig}
+            showResultCount
+            enablePagination
+          />
+        </div>
+      </div>
       <Modal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        isOpen={isFormModalOpen}
+        onClose={actions.closeFormModal}
         title={editingUser ? "Edit User" : "Invite New User"}
       >
-        <form onSubmit={handleSaveUser} className="space-y-4">
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              defaultValue={editingUser?.name || ""}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              defaultValue={editingUser?.email || ""}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="role"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Role
-            </label>
-            <select
-              id="role"
-              name="role"
-              defaultValue={editingUser?.role || "Viewer"}
-              className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-            >
-              <option>Admin</option>
-              <option>Editor</option>
-              <option>Viewer</option>
-            </select>
-          </div>
-          <div className="flex justify-end gap-3 pt-4">
-            <button
-              type="button"
-              onClick={handleCloseModal}
-              className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="rounded-lg border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
-            >
-              Save User
-            </button>
-          </div>
-        </form>
+        <UserForm
+          onSubmit={actions.saveUser}
+          onCancel={actions.closeFormModal}
+          initialData={editingUser}
+        />
       </Modal>
+      <ConfirmDeleteModal
+        isOpen={!!userToDelete}
+        onCancel={actions.closeDeleteModal}
+        onConfirm={actions.confirmDelete}
+        itemName={userToDelete?.name || ""}
+      />
     </div>
   );
 };

@@ -7,6 +7,7 @@ import {
   BoxIcon,
   Cast,
   X,
+  Archive,
 } from "lucide-react";
 import SidebarLink from "./SidebarLink";
 
@@ -80,16 +81,17 @@ const Sidebar = ({
               to="/mailboxes"
               isOpen={isOpen}
             />
-            <SidebarLink
-              icon={Cast}
-              text="Broadcasts"
-              to="/broadcasts"
-              isOpen={isOpen}
-            />
+
             <SidebarLink
               icon={Users}
               text="Users"
               to="/users"
+              isOpen={isOpen}
+            />
+            <SidebarLink
+              icon={Archive}
+              text="Reports"
+              to="/reports"
               isOpen={isOpen}
             />
           </nav>
