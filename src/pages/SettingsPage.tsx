@@ -1,5 +1,5 @@
 import React from "react";
-import { Settings, CreditCard } from "lucide-react";
+import { CreditCard } from "lucide-react";
 
 const SettingsCard = ({
   title,
@@ -10,7 +10,7 @@ const SettingsCard = ({
   description: string;
   children: React.ReactNode;
 }) => (
-  <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm">
+  <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 ">
     <div className="p-6 border-b border-slate-200 dark:border-slate-700">
       <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">
         {title}

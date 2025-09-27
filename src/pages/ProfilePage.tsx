@@ -1,5 +1,5 @@
 import React from "react";
-import { UserCircle, Camera } from "lucide-react";
+import { Camera } from "lucide-react";
 
 const ProfileCard = ({
   title,
@@ -8,7 +8,7 @@ const ProfileCard = ({
   title: string;
   children: React.ReactNode;
 }) => (
-  <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6 md:p-8">
+  <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
     <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">
       {title}
     </h3>

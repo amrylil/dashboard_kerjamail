@@ -9,6 +9,7 @@ import {
   Archive,
 } from "lucide-react";
 import SidebarLink from "./SidebarLink";
+import { Link } from "react-router-dom";
 
 type SidebarProps = {
   isOpen: boolean;
@@ -29,10 +30,10 @@ const Sidebar = ({
         className={` 
         h-full flex flex-col overflow-y-auto bg-slate-50 dark:bg-slate-800 
         transition-transform duration-300 ease-in-out justify-center 
-        fixed inset-y-0 left-0 z-30 w-64 p-4 h 
+        fixed inset-y-0 left-0 z-30 w-64 p-4   
         lg:relative lg:inset-auto lg:z-auto lg:translate-x-0 lg:p-0 lg:m-3 lg:rounded-lg lg:border lg:border-gray-200 dark:lg:border-gray-700
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
-        ${isOpen ? "lg:w-64 lg:px-5 " : "lg:w-20 lg:px-3 items-center"}
+        ${isOpen ? "lg:w-56 lg:px-5 " : "lg:w-20 lg:px-3 items-center"}
       `}
       >
         <button
@@ -42,7 +43,7 @@ const Sidebar = ({
           <X className="h-6 w-6 text-slate-600 dark:text-slate-400" />
         </button>
 
-        <div className="text-2xl font-bold text-sky-600 my-6">
+        <div className="text-2xl font-bold text-sky-600 my-4">
           <div className="flex items-center transition-all duration-200">
             <img
               src="/images/kerjamail.png"
@@ -98,7 +99,10 @@ const Sidebar = ({
             />
           </nav>
 
-          <button className="flex my-4 w-full items-center rounded-lg p-3 text-gray-600 dark:text-gray-300 transition-colors duration-300 hover:bg-gray-200 dark:hover:bg-slate-700 hover:text-gray-700 dark:hover:text-gray-50">
+          <Link
+            to={"/login"}
+            className="flex my-4 w-full items-center rounded-lg p-3 text-gray-600 dark:text-gray-300 transition-colors duration-300 hover:bg-gray-200 dark:hover:bg-slate-700 hover:text-gray-700 dark:hover:text-gray-50"
+          >
             <LogOut className="h-5 w-5" />
             <span
               className={`mx-2 text-sm font-medium transition-all duration-200 ${
@@ -107,17 +111,21 @@ const Sidebar = ({
             >
               Logout
             </span>
-          </button>
+          </Link>
         </div>
       </aside>
       <button
         onClick={toggle}
         className={`
-      absolute top-11 z-40 h-6 w-6 lg:flex items-center justify-center rounded-full
+      absolute top-9 z-40 h-6 w-6 lg:flex items-center justify-center rounded
       text-gray-800 dark:text-gray-200 hidden  
-      bg-slate-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700
+       dark:bg-slate-800
        transition-all duration-200
-      ${isOpen ? "left-56" : "left-[75px]"}
+      ${
+        isOpen
+          ? "left-52 "
+          : "left-[75px] bg-blue-100  border border-gray-200 dark:border-gray-700"
+      }
     `}
       >
         <ChevronLeft

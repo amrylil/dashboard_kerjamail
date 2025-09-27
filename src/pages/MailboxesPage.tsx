@@ -21,16 +21,7 @@ import {
 } from "lucide-react";
 import MailboxForm from "../components/forms/MailboxForm";
 import type { Mailbox } from "../types/mailboxes";
-
-const formatDate = (isoString: string) => {
-  if (isoString === "Never") return "Never";
-  const date = new Date(isoString);
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-};
+import { FormatDate } from "../utils/formatdate";
 
 const StorageBar = ({
   used,
@@ -126,7 +117,7 @@ const MailboxesPage = () => {
         header: "Last Login",
         accessorKey: "lastLogin",
         enableSorting: true,
-        cell: ({ row }) => formatDate(row.original.lastLogin),
+        cell: ({ row }) => FormatDate(row.original.lastLogin),
       },
       {
         header: "Actions",
@@ -225,7 +216,7 @@ const MailboxesPage = () => {
             icon={<HardDrive className="text-blue-600" />}
           />
         </div>
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
           <GenericTable
             data={mailboxes}
             columns={columns}

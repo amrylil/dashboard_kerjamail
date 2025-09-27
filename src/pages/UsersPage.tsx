@@ -22,13 +22,8 @@ import {
 } from "lucide-react";
 import type { User } from "../types/users";
 import UserForm from "../components/forms/UserForm";
+import { FormatDate } from "../utils/formatdate";
 
-const formatDate = (dateString: string) =>
-  new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
 const getInitials = (name: string) =>
   name
     .split(" ")
@@ -129,7 +124,7 @@ const UsersPage = () => {
         header: "Date Joined",
         accessorKey: "joined",
         enableSorting: true,
-        cell: ({ row }) => formatDate(row.original.joined),
+        cell: ({ row }) => FormatDate(row.original.joined),
       },
       {
         header: "Actions",

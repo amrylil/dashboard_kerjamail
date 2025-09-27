@@ -22,13 +22,7 @@ import type { Domain } from "../types/domain";
 import DomainForm from "../components/forms/DomainForm";
 import Modal from "../components/ui/Modal";
 import { useDomains } from "../hooks/useDomain";
-
-const formatDate = (isoString: string) =>
-  new Date(isoString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+import { FormatDate } from "../utils/formatdate";
 
 const StatusDisplay = ({ status }: { status: Domain["status"] }) => {
   const styles = {
@@ -70,7 +64,7 @@ const DomainsPage = () => {
               {row.original.domainName}
             </div>
             <div className="text-xs text-slate-500">
-              Expires on {formatDate(row.original.expiryDate)}
+              Expires on {FormatDate(row.original.expiryDate)}
             </div>
           </div>
         ),
@@ -92,7 +86,7 @@ const DomainsPage = () => {
         header: "Created At",
         accessorKey: "createdAt",
         enableSorting: true,
-        cell: ({ row }) => formatDate(row.original.createdAt),
+        cell: ({ row }) => FormatDate(row.original.createdAt),
       },
       {
         header: "Actions",
@@ -192,7 +186,7 @@ const DomainsPage = () => {
             icon={<PauseCircle className="text-red-600" />}
           />
         </div>
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
           <GenericTable
             data={domains}
             columns={columns}

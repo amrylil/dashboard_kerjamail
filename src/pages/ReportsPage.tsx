@@ -22,13 +22,7 @@ import {
   UserMinus,
   Download,
 } from "lucide-react";
-
-const formatDate = (isoString: string) => {
-  return new Date(isoString).toLocaleString("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-};
+import { FormatDate } from "../utils/formatdate";
 
 const StorageBar = ({ used, quota }: { used: number; quota: number }) => {
   const percentage = (used / quota) * 100;
@@ -118,7 +112,7 @@ const ReportsPage = () => {
       {
         header: "Timestamp",
         accessorKey: "timestamp",
-        cell: ({ row }) => formatDate(row.original.timestamp),
+        cell: ({ row }) => FormatDate(row.original.timestamp),
       },
       { header: "Actor", accessorKey: "actor" },
       {
@@ -182,23 +176,21 @@ const ReportsPage = () => {
           />
         </div>
 
-        {/* DOMAIN STATISTICS */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
           <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">
             Domain Statistics
           </h2>
           <GenericTable data={domainStats} columns={domainColumns} />
         </div>
 
-        {/* MAILBOX & ACTIVITY */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
             <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               Top Mailbox Usage
             </h2>
             <GenericTable data={topUsers} columns={topUserColumns} />
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
             <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               Activity Log
             </h2>
