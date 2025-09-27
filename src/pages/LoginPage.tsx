@@ -20,7 +20,7 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen font-jost bg-slate-100 dark:bg-slate-900 flex items-center justify-center p-4 ">
+    <div className="min-h-screen font-jost bg-slate-100 dark:bg-slate-900 flex items-center justify-center p-4 dark:text-slate-50">
       <div className="w-full max-w-5xl flex flex-col lg:flex-row bg-white dark:bg-slate-800 rounded-2xl shadow-2xl overflow-hidden">
         <div className="relative lg:w-1/2 p-8 sm:p-12 flex flex-col justify-between text-white bg-blue-600 rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none">
           <img
