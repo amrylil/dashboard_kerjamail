@@ -31,7 +31,7 @@ const DashboardLayout = () => {
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header toggleMobileMenu={toggleMobileMenu} crumbs={crumbs} />
 
-        <main className="flex-1 overflow-y-auto p-8 bg-gray-50 rounded-lg border border-gray-200 dark:border-gray-700 mb-3  mr-3 dark:bg-slate-800">
+        <main className="flex-1 overflow-y-auto lg:p-8 p-4 bg-gray-50 rounded-lg border border-gray-200 dark:border-gray-700 mb-3  mr-3 dark:bg-slate-800">
           <Outlet />
         </main>
       </div>
