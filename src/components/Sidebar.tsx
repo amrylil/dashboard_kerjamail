@@ -54,7 +54,10 @@ const Sidebar = ({
                 isOpen ? "w-auto opacity-100" : "w-0 opacity-0"
               }`}
             >
-              <h1 className="text-xl dark:text-slate-50">KERJAMAIL</h1>
+              <h1 className="text-xl  text-blue-600 dark:text-blue-300">
+                <span className="text-blue-950  dark:text-slate-50">KERJA</span>
+                MAIL
+              </h1>
             </div>
           </div>
         </div>

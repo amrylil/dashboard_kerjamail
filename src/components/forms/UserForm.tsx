@@ -13,7 +13,7 @@ const UserForm: React.FC<UserFormProps> = ({
   initialData,
 }) => {
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onSubmit={onSubmit} className="space-y-6 dark:text-slate-50">
       <div>
         <label
           htmlFor="name"
@@ -28,7 +28,7 @@ const UserForm: React.FC<UserFormProps> = ({
           defaultValue={initialData?.name || ""}
           placeholder="e.g., John Doe"
           required
-          className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 "
         />
       </div>
       <div>
@@ -45,7 +45,7 @@ const UserForm: React.FC<UserFormProps> = ({
           defaultValue={initialData?.email || ""}
           placeholder="e.g., john.doe@example.com"
           required
-          className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
       <div>
@@ -59,7 +59,7 @@ const UserForm: React.FC<UserFormProps> = ({
           id="role"
           name="role"
           defaultValue={initialData?.role || "Member"}
-          className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
+          className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
         >
           <option>Owner</option>
           <option>Admin</option>
@@ -76,7 +76,7 @@ const UserForm: React.FC<UserFormProps> = ({
         </button>
         <button
           type="submit"
-          className="px-6 py-3 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700"
+          className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700"
         >
           Save User
         </button>

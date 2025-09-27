@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import type { FilterConfig } from "../components/ui/GenericTable";
 import type { User, UserStats } from "../types/users";
+import { useToast } from "../context/ToastContext";
 
 const initialUsers: User[] = [
   {
@@ -43,6 +44,8 @@ export const useUsers = (defaultUsers: User[] = initialUsers) => {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
+  const { addToast } = useToast();
+
   const handleOpenCreateModal = useCallback(() => {
     setEditingUser(null);
     setIsFormModalOpen(true);
@@ -69,22 +72,31 @@ export const useUsers = (defaultUsers: User[] = initialUsers) => {
   const handleConfirmDelete = useCallback(() => {
     if (userToDelete) {
       setUsers((prev) => prev.filter((u) => u.id !== userToDelete.id));
+      addToast(`User '${userToDelete.name}' has been removed.`, "success");
       handleCloseDeleteModal();
     }
-  }, [userToDelete, handleCloseDeleteModal]);
+  }, [userToDelete, handleCloseDeleteModal, addToast]);
 
-  const handleToggleUserStatus = useCallback((userId: number) => {
-    setUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user.id === userId
-          ? {
-              ...user,
-              status: user.status === "Active" ? "Suspended" : "Active",
-            }
-          : user
-      )
-    );
-  }, []);
+  const handleToggleUserStatus = useCallback(
+    (userId: number) => {
+      const userToUpdate = users.find((user) => user.id === userId);
+      if (!userToUpdate) return;
+
+      const newStatus =
+        userToUpdate.status === "Active" ? "Suspended" : "Active";
+      addToast(
+        `User '${userToUpdate.name}' status changed to ${newStatus}.`,
+        "info"
+      );
+
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === userId ? { ...user, status: newStatus } : user
+        )
+      );
+    },
+    [users, addToast]
+  );
 
   const handleSaveUser = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -100,20 +112,22 @@ export const useUsers = (defaultUsers: User[] = initialUsers) => {
             u.id === editingUser.id ? { ...u, name, email, role } : u
           )
         );
+        addToast(`User '${name}' has been updated successfully.`, "success");
       } else {
         const newUser: User = {
           id: Date.now(),
           name,
           email,
           role,
-          status: "Active", // Pengguna baru selalu aktif
+          status: "Active",
           joined: new Date().toISOString().split("T")[0],
         };
         setUsers((prev) => [...prev, newUser]);
+        addToast(`User '${name}' has been invited successfully.`, "success");
       }
       handleCloseFormModal();
     },
-    [editingUser, handleCloseFormModal]
+    [editingUser, handleCloseFormModal, addToast]
   );
 
   const stats: UserStats = useMemo(() => {

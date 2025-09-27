@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import ThemeToggle from "./ui/ThemeToggle"; // Pastikan path ini benar
+import ThemeToggle from "./ui/ThemeToggle";
 import { Menu, Bell, Plus } from "lucide-react";
+import { Link } from "react-router-dom";
 
-// --- Komponen Ikon ---
 const SearchIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -62,7 +62,6 @@ const Header: React.FC<HeaderProps> = ({ toggleMobileMenu }) => {
   return (
     <header className="relative flex-shrink-0 bg-slate-50 dark:bg-slate-800 px-4 sm:px-6 py-3 my-3 mx-0 sm:mr-3 sm:ml-0 rounded-none sm:rounded-lg border-b sm:border border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between">
-        {/* Sisi Kiri: Hamburger Menu (Mobile) & Search (Desktop) */}
         <div className="flex items-center gap-4">
           <button
             onClick={toggleMobileMenu}
@@ -83,7 +82,6 @@ const Header: React.FC<HeaderProps> = ({ toggleMobileMenu }) => {
           </div>
         </div>
 
-        {/* Sisi Kanan: Aksi & Profil */}
         <div className="flex items-center space-x-2 sm:space-x-4">
           <button className="flex items-center gap-2 rounded-lg bg-[#043a8b] hover:bg-[#0c2556] dark:bg-blue-600 dark:hover:bg-blue-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5">
             <Plus className="h-4 w-4" />
@@ -102,7 +100,6 @@ const Header: React.FC<HeaderProps> = ({ toggleMobileMenu }) => {
 
           <div className="h-8 w-px bg-gray-200 dark:bg-gray-700"></div>
 
-          {/* Dropdown Profil */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -134,25 +131,25 @@ const Header: React.FC<HeaderProps> = ({ toggleMobileMenu }) => {
             </button>
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-20">
-                <a
-                  href="#"
+                <Link
+                  to={"/profile"}
                   className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700"
                 >
                   My Profile
-                </a>
-                <a
-                  href="#"
+                </Link>
+                <Link
+                  to={"/setting"}
                   className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700"
                 >
                   Settings
-                </a>
+                </Link>
                 <div className="my-1 h-px bg-gray-200 dark:bg-gray-700"></div>
-                <a
-                  href="#"
+                <Link
+                  to={"/login"}
                   className="block px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"
                 >
                   Logout
-                </a>
+                </Link>
               </div>
             )}
           </div>

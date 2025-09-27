@@ -17,8 +17,7 @@ const MailboxForm: React.FC<MailboxFormProps> = ({
   const isEditMode = !!initialData;
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
-      {/* Email Address */}
+    <form onSubmit={onSubmit} className="space-y-6 dark:text-slate-50">
       <div>
         <label
           htmlFor="email"
@@ -33,7 +32,7 @@ const MailboxForm: React.FC<MailboxFormProps> = ({
             defaultValue={initialData?.email.split("@")[0] || ""}
             placeholder="username"
             required
-            readOnly={isEditMode} // Username tidak bisa diubah saat edit
+            readOnly={isEditMode}
             className="w-1/2 px-4 py-3 bg-white dark:bg-slate-800 border rounded-xl disabled:bg-slate-100 dark:disabled:bg-slate-700"
             disabled={isEditMode}
           />
@@ -52,7 +51,6 @@ const MailboxForm: React.FC<MailboxFormProps> = ({
         </div>
       </div>
 
-      {/* Password */}
       <div>
         <label
           htmlFor="password"
@@ -69,7 +67,7 @@ const MailboxForm: React.FC<MailboxFormProps> = ({
               ? "Leave blank to keep current password"
               : "Enter a strong password"
           }
-          required={!isEditMode} // Wajib diisi saat membuat baru
+          required={!isEditMode}
           className="w-full px-4 py-3 bg-white dark:bg-slate-800 border rounded-xl"
         />
       </div>
@@ -104,7 +102,7 @@ const MailboxForm: React.FC<MailboxFormProps> = ({
         </button>
         <button
           type="submit"
-          className="px-6 py-3 bg-purple-600 text-white rounded-xl font-medium"
+          className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium"
         >
           {isEditMode ? "Save Changes" : "Create Mailbox"}
         </button>

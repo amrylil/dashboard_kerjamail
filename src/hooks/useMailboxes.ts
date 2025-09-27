@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import type { FilterConfig } from "../components/ui/GenericTable";
 import type { Mailbox, MailboxStats } from "../types/mailboxes";
+import { useToast } from "../context/ToastContext";
 
 const initialMailboxes: Mailbox[] = [
   {
@@ -53,6 +54,8 @@ export const useMailboxes = (
   const [editingMailbox, setEditingMailbox] = useState<Mailbox | null>(null);
   const [mailboxToDelete, setMailboxToDelete] = useState<Mailbox | null>(null);
 
+  const { addToast } = useToast();
+
   const availableDomains = useMemo(
     () => [...new Set(mailboxes.map((m) => m.domain))],
     [mailboxes]
@@ -81,19 +84,34 @@ export const useMailboxes = (
   const handleConfirmDelete = useCallback(() => {
     if (mailboxToDelete) {
       setMailboxes((prev) => prev.filter((m) => m.id !== mailboxToDelete.id));
+      addToast(
+        `Mailbox '${mailboxToDelete.email}' has been removed.`,
+        "success"
+      );
       handleCloseDeleteModal();
     }
-  }, [mailboxToDelete, handleCloseDeleteModal]);
+  }, [mailboxToDelete, handleCloseDeleteModal, addToast]);
 
-  const handleToggleMailboxStatus = useCallback((mailboxId: number) => {
-    setMailboxes((prev) =>
-      prev.map((m) =>
-        m.id === mailboxId
-          ? { ...m, status: m.status === "Active" ? "Suspended" : "Active" }
-          : m
-      )
-    );
-  }, []);
+  const handleToggleMailboxStatus = useCallback(
+    (mailboxId: number) => {
+      const mailboxToUpdate = mailboxes.find((m) => m.id === mailboxId);
+      if (!mailboxToUpdate) return;
+
+      const newStatus =
+        mailboxToUpdate.status === "Active" ? "Suspended" : "Active";
+      addToast(
+        `Mailbox '${
+          mailboxToUpdate.email
+        }' has been ${newStatus.toLowerCase()}.`,
+        "info"
+      );
+
+      setMailboxes((prev) =>
+        prev.map((m) => (m.id === mailboxId ? { ...m, status: newStatus } : m))
+      );
+    },
+    [mailboxes, addToast]
+  );
 
   const handleSaveMailbox = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -112,6 +130,10 @@ export const useMailboxes = (
               : m
           )
         );
+        addToast(
+          `Mailbox '${editingMailbox.email}' has been updated.`,
+          "success"
+        );
       } else {
         const username = formData.get("username") as string;
         const domain = formData.get("domain") as string;
@@ -125,10 +147,11 @@ export const useMailboxes = (
           lastLogin: "Never",
         };
         setMailboxes((prev) => [...prev, newMailbox]);
+        addToast(`Mailbox '${newMailbox.email}' has been created.`, "success");
       }
       handleCloseFormModal();
     },
-    [editingMailbox, handleCloseFormModal]
+    [editingMailbox, handleCloseFormModal, addToast]
   );
 
   const stats: MailboxStats = useMemo(() => {

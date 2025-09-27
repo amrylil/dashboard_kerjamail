@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import type { FilterConfig } from "../components/ui/GenericTable";
 import type { DnsRecord, Domain, DomainStats } from "../types/domain";
+import { useToast } from "../context/ToastContext";
 
 const generateDnsRecords = (): DnsRecord[] => [
   { type: "MX", host: "@", value: "mx.kerjamail.co", status: "unverified" },
@@ -60,6 +61,8 @@ export const useDomains = (defaultDomains: Domain[] = initialDomains) => {
   const [domainToDelete, setDomainToDelete] = useState<Domain | null>(null);
   const [domainForDns, setDomainForDns] = useState<Domain | null>(null);
 
+  const { addToast } = useToast();
+
   const handleOpenCreateModal = useCallback(() => setIsFormModalOpen(true), []);
   const handleCloseFormModal = useCallback(() => setIsFormModalOpen(false), []);
   const handleOpenDeleteModal = useCallback(
@@ -76,39 +79,65 @@ export const useDomains = (defaultDomains: Domain[] = initialDomains) => {
   const handleConfirmDelete = useCallback(() => {
     if (domainToDelete) {
       setDomains((prev) => prev.filter((d) => d.id !== domainToDelete.id));
+      addToast(
+        `Domain '${domainToDelete.domainName}' has been removed.`,
+        "success"
+      );
       handleCloseDeleteModal();
     }
-  }, [domainToDelete, handleCloseDeleteModal]);
+  }, [domainToDelete, handleCloseDeleteModal, addToast]);
 
-  const handleToggleDomainStatus = useCallback((domainId: number) => {
-    setDomains((prev) =>
-      prev.map((d) =>
-        d.id === domainId
-          ? { ...d, status: d.status === "Active" ? "Suspended" : "Active" }
-          : d
-      )
-    );
-  }, []);
+  const handleToggleDomainStatus = useCallback(
+    (domainId: number) => {
+      const domainToUpdate = domains.find((d) => d.id === domainId);
+      if (!domainToUpdate) return;
 
-  const handleVerifyDomain = useCallback((domainId: number) => {
-    // Simulasi proses verifikasi
-    setTimeout(() => {
-      setDomains((prev) =>
-        prev.map((d) =>
-          d.id === domainId
-            ? {
-                ...d,
-                status: "Active",
-                dnsRecords: d.dnsRecords.map((r) => ({
-                  ...r,
-                  status: "verified",
-                })),
-              }
-            : d
-        )
+      const newStatus =
+        domainToUpdate.status === "Active" ? "Suspended" : "Active";
+      addToast(
+        `Domain '${
+          domainToUpdate.domainName
+        }' has been ${newStatus.toLowerCase()}.`,
+        "info"
       );
-    }, 1500); // Delay 1.5 detik
-  }, []);
+
+      setDomains((prev) =>
+        prev.map((d) => (d.id === domainId ? { ...d, status: newStatus } : d))
+      );
+    },
+    [domains, addToast]
+  );
+
+  const handleVerifyDomain = useCallback(
+    (domainId: number) => {
+      const domainToVerify = domains.find((d) => d.id === domainId);
+      if (!domainToVerify) return;
+
+      addToast(`Verifying DNS for '${domainToVerify.domainName}'...`, "info");
+
+      setTimeout(() => {
+        setDomains((prev) =>
+          prev.map((d) =>
+            d.id === domainId
+              ? {
+                  ...d,
+                  status: "Active",
+                  dnsRecords: d.dnsRecords.map((r) => ({
+                    ...r,
+                    status: "verified",
+                  })),
+                }
+              : d
+          )
+        );
+        addToast(
+          `DNS for '${domainToVerify.domainName}' verified successfully!`,
+          "success"
+        );
+      }, 1500);
+    },
+    [domains, addToast]
+  );
 
   const handleSaveDomain = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -119,16 +148,20 @@ export const useDomains = (defaultDomains: Domain[] = initialDomains) => {
         id: Date.now(),
         domainName,
         status: "Pending DNS",
-        expiryDate: new Date(Date.now() + 31536000000).toISOString(), // 1 tahun dari sekarang
+        expiryDate: new Date(Date.now() + 31536000000).toISOString(),
         activeMailboxes: 0,
         createdAt: new Date().toISOString(),
         dnsRecords: generateDnsRecords(),
       };
       setDomains((prev) => [...prev, newDomain]);
+      addToast(
+        `Domain '${domainName}' added. Please configure DNS.`,
+        "success"
+      );
       handleCloseFormModal();
-      handleOpenDnsModal(newDomain); // Langsung tampilkan instruksi DNS
+      handleOpenDnsModal(newDomain);
     },
-    [handleCloseFormModal, handleOpenDnsModal]
+    [handleCloseFormModal, handleOpenDnsModal, addToast]
   );
 
   const stats: DomainStats = useMemo(() => {
