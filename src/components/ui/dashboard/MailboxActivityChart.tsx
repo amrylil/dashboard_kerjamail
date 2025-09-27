@@ -26,7 +26,7 @@ export const MailboxActivityChart = () => {
       <p className="text-sm text-gray-500 dark:text-slate-400">
         Received vs. Sent (Last 5 Months)
       </p>
-      <div className="h-48 mt-4">
+      <div className="h-48 mt-4 dark:text-slate-50">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={activityData}
